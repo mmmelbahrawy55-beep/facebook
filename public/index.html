@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>نشر على فيسبوك</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-    <script src="https://connect.facebook.net/en_US/sdk.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -60,7 +59,7 @@
             margin-bottom: 10px;
         }
         .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .btn-fb { background: #1877f2; color: white; font-size: 20px; }
+        .btn-blue { background: #1877f2; color: white; }
         .btn-green { background: #00a400; color: white; }
         .btn-red { background: #e41e3f; color: white; }
         .divider { margin: 20px 0; border: 1px solid #eee; }
@@ -72,22 +71,15 @@
         }
         .result.success { display: block; background: #e8f5e9; color: #2e7d32; }
         .result.error { display: block; background: #ffebee; color: #c62828; }
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
+        .result.info { display: block; background: #e3f2fd; color: #1565c0; }
+        .note {
+            background: #fff3cd;
             padding: 15px;
-            background: #f5f5f5;
             border-radius: 10px;
             margin-bottom: 20px;
+            font-size: 14px;
+            color: #856404;
         }
-        .user-info img {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-        }
-        .user-info h4 { color: #333; }
-        .user-info p { color: #666; font-size: 14px; }
     </style>
 </head>
 <body>
@@ -95,20 +87,10 @@
         <h1>📱 نشر على فيسبوك</h1>
         <p class="subtitle">نشر إعلانات على مجموعات فيسبوك</p>
 
-        <div id="statusBox" class="status disconnected">غير متصل بفيسبوك</div>
+        <div id="statusBox" class="status disconnected">❌ غير متصل بفيسبوك</div>
 
-        <div id="loginSection">
-            <button id="loginBtn" class="btn btn-fb" onclick="loginWithFacebook()">
-                🔗 تسجيل الدخول بفيسبوك
-            </button>
-        </div>
-
-        <div id="userSection" style="display: none;">
-            <div class="user-info" id="userInfo"></div>
-            <button id="logoutBtn" class="btn btn-red" onclick="logoutFromFacebook()">
-                🔌 قطع الاتصال
-            </button>
-        </div>
+        <button id="loginBtn" class="btn btn-blue" onclick="login()">🔗 اتصل بفيسبوك</button>
+        <button id="logoutBtn" class="btn btn-red" style="display: none;" onclick="logout()">🔌 قطع الاتصال</button>
 
         <div class="divider"></div>
 
@@ -127,98 +109,71 @@
                 <label>📍 المحافظة</label>
                 <select id="governorate">
                     <option value="">اختر المحافظة</option>
-                    <option value="Cairo">القاهرة</option>
-                    <option value="Alexandria">الإسكندرية</option>
-                    <option value="Giza">الجيزة</option>
-                    <option value="Qalyubia">القليوبية</option>
-                    <option value="Sharqia">الشرقية</option>
-                    <option value="Dakahlia">الدقهلية</option>
-                    <option value="Beheira">البحيرة</option>
-                    <option value="Kafr El Sheikh">كفر الشيخ</option>
-                    <option value="Gharbia">الغربية</option>
-                    <option value="Monufia">المنوفية</option>
-                    <option value="Damietta">دمياط</option>
-                    <option value="Port Said">بورسعيد</option>
-                    <option value="Ismailia">الإسماعيلية</option>
-                    <option value="Beni Suef">بني سويف</option>
-                    <option value="Faiyum">الفيوم</option>
-                    <option value="Minya">المنيا</option>
-                    <option value="Assiut">أسيوط</option>
-                    <option value="Sohag">سوهاج</option>
-                    <option value="Qena">قنا</option>
-                    <option value="Luxor">الأقصر</option>
-                    <option value="Aswan">أسوان</option>
-                    <option value="Red Sea">البحر الأحمر</option>
-                    <option value="Matrouh">مطروح</option>
+                    <option value="القاهرة">القاهرة</option>
+                    <option value="الإسكندرية">الإسكندرية</option>
+                    <option value="الجيزة">الجيزة</option>
+                    <option value="القليوبية">القليوبية</option>
+                    <option value="الشرقية">الشرقية</option>
+                    <option value="الدقهلية">الدقهلية</option>
+                    <option value="البحيرة">البحيرة</option>
+                    <option value="كفر الشيخ">كفر الشيخ</option>
+                    <option value="الغربية">الغربية</option>
+                    <option value="المنوفية">المنوفية</option>
+                    <option value="دمياط">دمياط</option>
+                    <option value="بورسعيد">بورسعيد</option>
+                    <option value="الإسماعيلية">الإسماعيلية</option>
+                    <option value="بني سويف">بني سويف</option>
+                    <option value="الفيوم">الفيوم</option>
+                    <option value="المنيا">المنيا</option>
+                    <option value="أسيوط">أسيوط</option>
+                    <option value="سوهاج">سوهاج</option>
+                    <option value="قنا">قنا</option>
+                    <option value="الأقصر">الأقصر</option>
+                    <option value="أسوان">أسوان</option>
+                    <option value="البحر الأحمر">البحر الأحمر</option>
+                    <option value="مطروح">مطروح</option>
                 </select>
             </div>
 
-            <button id="postBtn" class="btn btn-green" onclick="startPosting()">
-                🚀 ابدأ النشر
-            </button>
+            <button id="postBtn" class="btn btn-green" onclick="startPosting()">🚀 ابدأ النشر</button>
         </div>
 
         <div id="result" class="result"></div>
     </div>
 
     <script>
-        let fbAccessToken = null;
-        let fbUser = null;
+        async function login() {
+            const loginBtn = document.getElementById('loginBtn');
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'جاري الاتصال...';
+            showResult('جاري فتح فيسبوك...', 'info');
 
-        // Initialize Facebook SDK
-        window.fbAsyncInit = function() {
-            FB.init({
-                appId: 'YOUR_FACEBOOK_APP_ID', // حط App ID بتاعك هنا
-                cookie: true,
-                xfbml: true,
-                version: 'v19.0'
-            });
-        };
+            const res = await fetch('/api/login', { method: 'POST' });
+            const data = await res.json();
 
-        function loginWithFacebook() {
-            FB.login(function(response) {
-                if (response.authResponse) {
-                    fbAccessToken = response.authResponse.accessToken;
-                    getUserInfo();
-                } else {
-                    showResult('تم إلغاء تسجيل الدخول', 'error');
-                }
-            }, { scope: 'pages_manage_posts,pages_read_engagement,groups_manage_posts' });
+            loginBtn.disabled = false;
+            loginBtn.textContent = '🔗 اتصل بفيسبوك';
+
+            if (data.success) {
+                document.getElementById('statusBox').textContent = '✅ متصل بفيسبوك';
+                document.getElementById('statusBox').className = 'status connected';
+                loginBtn.style.display = 'none';
+                document.getElementById('logoutBtn').style.display = 'block';
+                document.getElementById('postSection').style.display = 'block';
+                showResult('تم الاتصال بنجاح', 'success');
+            } else {
+                showResult(data.message, 'error');
+            }
         }
 
-        function getUserInfo() {
-            FB.api('/me', { fields: 'name,email,picture' }, function(response) {
-                fbUser = response;
-                showLoggedIn();
-            });
-        }
-
-        function showLoggedIn() {
-            document.getElementById('statusBox').textContent = '✅ متصل بفيسبوك';
-            document.getElementById('statusBox').className = 'status connected';
-            document.getElementById('loginSection').style.display = 'none';
-            document.getElementById('userSection').style.display = 'block';
-            document.getElementById('postSection').style.display = 'block';
-            
-            document.getElementById('userInfo').innerHTML = `
-                <img src="${fbUser.picture.data.url}" alt="${fbUser.name}">
-                <div>
-                    <h4>${fbUser.name}</h4>
-                    <p>${fbUser.email || 'متصل بفيسبوك'}</p>
-                </div>
-            `;
-        }
-
-        function logoutFromFacebook() {
-            FB.logout(function() {
-                fbAccessToken = null;
-                fbUser = null;
-                document.getElementById('statusBox').textContent = '❌ غير متصل بفيسبوك';
-                document.getElementById('statusBox').className = 'status disconnected';
-                document.getElementById('loginSection').style.display = 'block';
-                document.getElementById('userSection').style.display = 'none';
-                document.getElementById('postSection').style.display = 'none';
-            });
+        async function logout() {
+            await fetch('/api/logout', { method: 'POST' });
+            document.getElementById('statusBox').textContent = '❌ غير متصل بفيسبوك';
+            document.getElementById('statusBox').className = 'status disconnected';
+            document.getElementById('loginBtn').style.display = 'block';
+            document.getElementById('logoutBtn').style.display = 'none';
+            document.getElementById('postSection').style.display = 'none';
+            showResult('تم قطع الاتصال', 'info');
         }
 
         async function startPosting() {
@@ -231,39 +186,26 @@
                 return;
             }
 
-            if (!fbAccessToken) {
-                showResult('يجب تسجيل الدخول بفيسبوك أولاً', 'error');
-                return;
-            }
-
             const postBtn = document.getElementById('postBtn');
             postBtn.disabled = true;
             postBtn.textContent = 'جاري النشر...';
+            showResult(`جاري النشر في مجموعات ${governorate}...`, 'info');
 
-            try {
-                const res = await fetch('/api/post', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        title,
-                        description,
-                        governorate,
-                        accessToken: fbAccessToken
-                    })
-                });
-                const data = await res.json();
-
-                if (data.error) {
-                    showResult(data.error, 'error');
-                } else {
-                    showResult(`✅ تم النشر في ${data.posted} مجموعة`, 'success');
-                }
-            } catch (e) {
-                showResult('خطأ في الاتصال', 'error');
-            }
+            const res = await fetch('/api/post', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title, description, governorate })
+            });
+            const data = await res.json();
 
             postBtn.disabled = false;
             postBtn.textContent = '🚀 ابدأ النشر';
+
+            if (data.success) {
+                showResult(data.message, 'success');
+            } else {
+                showResult(data.message, 'error');
+            }
         }
 
         function showResult(msg, type) {
