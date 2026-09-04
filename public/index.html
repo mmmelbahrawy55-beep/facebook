@@ -24,35 +24,10 @@
             max-width: 500px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
-        h1 {
-            text-align: center;
-            color: #1877f2;
-            margin-bottom: 10px;
-            font-size: 28px;
-        }
-        .subtitle {
-            text-align: center;
-            color: #666;
-            margin-bottom: 30px;
-        }
-        .status {
-            text-align: center;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            font-weight: 600;
-        }
-        .status.disconnected { background: #fee; color: #c00; }
-        .status.connected { background: #efe; color: #060; }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: #333;
-            font-weight: 600;
-        }
+        h1 { text-align: center; color: #1877f2; margin-bottom: 10px; font-size: 28px; }
+        .subtitle { text-align: center; color: #666; margin-bottom: 30px; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; color: #333; font-weight: 600; }
         input, textarea, select {
             width: 100%;
             padding: 12px 15px;
@@ -60,12 +35,8 @@
             border-radius: 10px;
             font-size: 16px;
             font-family: 'Cairo', sans-serif;
-            transition: border-color 0.3s;
         }
-        input:focus, textarea:focus, select:focus {
-            outline: none;
-            border-color: #1877f2;
-        }
+        input:focus, textarea:focus, select:focus { outline: none; border-color: #1877f2; }
         textarea { min-height: 120px; resize: vertical; }
         .btn {
             width: 100%;
@@ -76,16 +47,21 @@
             font-weight: 700;
             cursor: pointer;
             font-family: 'Cairo', sans-serif;
-            transition: all 0.3s;
             margin-bottom: 10px;
         }
         .btn:disabled { opacity: 0.5; cursor: not-allowed; }
         .btn-blue { background: #1877f2; color: white; }
-        .btn-blue:hover:not(:disabled) { background: #166fe5; }
-        .btn-red { background: #e41e3f; color: white; }
-        .btn-red:hover:not(:disabled) { background: #c13549; }
         .btn-green { background: #00a400; color: white; }
-        .btn-green:hover:not(:disabled) { background: #008f00; }
+        .btn-red { background: #e41e3f; color: white; }
+        .status {
+            text-align: center;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        .status.disconnected { background: #fee; color: #c00; }
+        .status.connected { background: #efe; color: #060; }
         .log {
             margin-top: 20px;
             padding: 15px;
@@ -96,32 +72,31 @@
             display: none;
         }
         .log.active { display: block; }
-        .log-entry {
-            padding: 8px;
-            margin-bottom: 5px;
-            border-radius: 5px;
-            font-size: 14px;
-        }
+        .log-entry { padding: 8px; margin-bottom: 5px; border-radius: 5px; font-size: 14px; }
         .log-entry.success { background: #e8f5e9; color: #2e7d32; }
         .log-entry.error { background: #ffebee; color: #c62828; }
         .log-entry.info { background: #e3f2fd; color: #1565c0; }
-        .spinner {
-            display: none;
-            text-align: center;
-            padding: 20px;
+        .divider { margin: 20px 0; border: 1px solid #eee; }
+        .setup-info {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
         }
-        .spinner.active { display: block; }
-        .spinner::after {
-            content: '';
-            display: inline-block;
-            width: 30px;
-            height: 30px;
-            border: 3px solid #e0e0e0;
-            border-top-color: #1877f2;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
+        .setup-info h3 { color: #856404; margin-bottom: 10px; }
+        .setup-info ol { padding-right: 20px; color: #856404; }
+        .ads-list { margin-top: 20px; }
+        .ad-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        .ad-item h4 { color: #333; margin-bottom: 5px; }
+        .ad-item p { color: #666; font-size: 14px; }
+        .ad-actions { margin-top: 10px; display: flex; gap: 10px; }
+        .btn-sm { padding: 8px 16px; font-size: 14px; width: auto; }
     </style>
 </head>
 <body>
@@ -129,28 +104,48 @@
         <h1>📱 نشر على فيسبوك</h1>
         <p class="subtitle">نشر إعلانات على مجموعات فيسبوك</p>
 
-        <div id="statusBox" class="status disconnected">
-            غير متصل بفيسبوك
+        <div class="setup-info">
+            <h3>⚙️ الإعداد المطلول:</h3>
+            <ol>
+                <li>أنشئ حساب على <a href="https://supabase.com" target="_blank">Supabase</a> (مجاني)</li>
+                <li>أنشئ مشروع جديد وخذ الـ URL و Key</li>
+                <li>أنشئ حساب على <a href="https://developers.facebook.com" target="_blank">Facebook Developers</a></li>
+                <li>أنشئ App واختر "Consumer"</li>
+                <li>احصل على Page Access Token</li>
+            </ol>
         </div>
 
-        <button id="loginBtn" class="btn btn-blue">
-            🔗 اتصل بفيسبوك
-        </button>
+        <div id="statusBox" class="status disconnected">غير مُعد</div>
 
-        <button id="logoutBtn" class="btn btn-red" style="display: none;">
-            🔌 قطع الاتصال
-        </button>
+        <div class="form-group">
+            <label>🔗 Supabase URL</label>
+            <input type="text" id="supabaseUrl" placeholder="https://xxxxx.supabase.co">
+        </div>
 
-        <hr style="margin: 20px 0; border: 1px solid #eee;">
+        <div class="form-group">
+            <label>🔑 Supabase Key</label>
+            <input type="text" id="supabaseKey" placeholder="eyJhbGciOiJIUzI1NiIs...">
+        </div>
 
-        <div id="postForm" style="display: none;">
+        <div class="form-group">
+            <label>🎫 Facebook Page Access Token</label>
+            <input type="text" id="fbToken" placeholder="EAAG...">
+        </div>
+
+        <button id="saveConfigBtn" class="btn btn-blue">💾 حفظ الإعدادات</button>
+
+        <div class="divider"></div>
+
+        <div id="postSection" style="display: none;">
+            <h2 style="margin-bottom: 20px; color: #333;">📝 إعلان جديد</h2>
+            
             <div class="form-group">
-                <label>📝 عنوان الإعلان</label>
+                <label>عنوان الإعلان</label>
                 <input type="text" id="title" placeholder="مثال: مطلوب موظفين">
             </div>
 
             <div class="form-group">
-                <label>📄 وصف الإعلان</label>
+                <label>وصف الإعلان</label>
                 <textarea id="description" placeholder="اكتب تفاصيل الإعلان..."></textarea>
             </div>
 
@@ -158,50 +153,67 @@
                 <label>📍 المحافظة</label>
                 <select id="governorate">
                     <option value="">اختر المحافظة</option>
-                    <option value="القاهرة">القاهرة</option>
-                    <option value="الإسكندرية">الإسكندرية</option>
-                    <option value="الجيزة">الجيزة</option>
-                    <option value="القليوبية">القليوبية</option>
-                    <option value="الشرقية">الشرقية</option>
-                    <option value="الدقهلية">الدقهلية</option>
-                    <option value="البحيرة">البحيرة</option>
-                    <option value="كفر الشيخ">كفر الشيخ</option>
-                    <option value="الغربية">الغربية</option>
-                    <option value="المنوفية">المنوفية</option>
-                    <option value="دمياط">دمياط</option>
-                    <option value="بورسعيد">بورسعيد</option>
-                    <option value="الإسماعيلية">الإسماعيلية</option>
-                    <option value="بني سويف">بني سويف</option>
-                    <option value="الفيوم">الفيوم</option>
-                    <option value="المنيا">المنيا</option>
-                    <option value="أسيوط">أسيوط</option>
-                    <option value="سوهاج">سوهاج</option>
-                    <option value="قنا">قنا</option>
-                    <option value="الأقصر">الأقصر</option>
-                    <option value="أسوان">أسوان</option>
-                    <option value="البحر الأحمر">البحر الأحمر</option>
-                    <option value="مطروح">مطروح</option>
+                    <option value="Cairo">القاهرة</option>
+                    <option value="Alexandria">الإسكندرية</option>
+                    <option value="Giza">الجيزة</option>
+                    <option value="Qalyubia">القليوبية</option>
+                    <option value="Sharqia">الشرقية</option>
+                    <option value="Dakahlia">الدقهلية</option>
+                    <option value="Beheira">البحيرة</option>
+                    <option value="Kafr El Sheikh">كفر الشيخ</option>
+                    <option value="Gharbia">الغربية</option>
+                    <option value="Monufia">المنوفية</option>
+                    <option value="Damietta">دمياط</option>
+                    <option value="Port Said">بورسعيد</option>
+                    <option value="Ismailia">الإسماعيلية</option>
+                    <option value="Beni Suef">بني سويف</option>
+                    <option value="Faiyum">الفيوم</option>
+                    <option value="Minya">المنيا</option>
+                    <option value="Assiut">أسيوط</option>
+                    <option value="Sohag">سوهاج</option>
+                    <option value="Qena">قنا</option>
+                    <option value="Luxor">الأقصر</option>
+                    <option value="Aswan">أسوان</option>
+                    <option value="Red Sea">البحر الأحمر</option>
+                    <option value="Matrouh">مطروح</option>
                 </select>
             </div>
 
-            <button id="postBtn" class="btn btn-green">
-                🚀 ابدأ النشر
-            </button>
-        </div>
+            <div class="form-group">
+                <label>🔗 رابط الصفحة (Page ID)</label>
+                <input type="text" id="pageId" placeholder="مثال: 123456789">
+            </div>
 
-        <div id="spinner" class="spinner"></div>
+            <button id="postBtn" class="btn btn-green">🚀 ابدأ النشر</button>
+        </div>
 
         <div id="log" class="log"></div>
     </div>
 
-    <script>
-        const loginBtn = document.getElementById('loginBtn');
-        const logoutBtn = document.getElementById('logoutBtn');
-        const postBtn = document.getElementById('postBtn');
-        const postForm = document.getElementById('postForm');
+    <script type="module">
+        import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+        let supabase = null;
+        let config = {
+            supabaseUrl: localStorage.getItem('supabaseUrl') || '',
+            supabaseKey: localStorage.getItem('supabaseKey') || '',
+            fbToken: localStorage.getItem('fbToken') || ''
+        };
+
         const statusBox = document.getElementById('statusBox');
-        const spinner = document.getElementById('spinner');
+        const postSection = document.getElementById('postSection');
         const logDiv = document.getElementById('log');
+        const saveConfigBtn = document.getElementById('saveConfigBtn');
+        const postBtn = document.getElementById('postBtn');
+
+        // Load saved config
+        document.getElementById('supabaseUrl').value = config.supabaseUrl;
+        document.getElementById('supabaseKey').value = config.supabaseKey;
+        document.getElementById('fbToken').value = config.fbToken;
+
+        if (config.supabaseUrl && config.supabaseKey && config.fbToken) {
+            initSupabase();
+        }
 
         function addLog(msg, type = 'info') {
             logDiv.classList.add('active');
@@ -212,85 +224,96 @@
             logDiv.scrollTop = logDiv.scrollHeight;
         }
 
-        function setStatus(connected) {
-            if (connected) {
-                statusBox.textContent = '✅ متصل بفيسبوك';
+        async function initSupabase() {
+            try {
+                supabase = createClient(config.supabaseUrl, config.supabaseKey);
+                
+                // Create tables if not exists
+                await supabase.rpc('create_tables_if_not_exists').catch(() => {
+                    // Table might already exist
+                });
+
+                statusBox.textContent = '✅ جاهز للنشر';
                 statusBox.className = 'status connected';
-                loginBtn.style.display = 'none';
-                logoutBtn.style.display = 'block';
-                postForm.style.display = 'block';
-            } else {
-                statusBox.textContent = '❌ غير متصل بفيسبوك';
-                statusBox.className = 'status disconnected';
-                loginBtn.style.display = 'block';
-                logoutBtn.style.display = 'none';
-                postForm.style.display = 'none';
+                postSection.style.display = 'block';
+                addLog('تم الاتصال بقاعدة البيانات', 'success');
+            } catch (error) {
+                addLog('خطأ في الاتصال بقاعدة البيانات: ' + error.message, 'error');
             }
         }
 
-        // Check status on load
-        fetch('/api/status').then(r => r.json()).then(d => setStatus(d.loggedIn));
+        saveConfigBtn.addEventListener('click', () => {
+            config.supabaseUrl = document.getElementById('supabaseUrl').value.trim();
+            config.supabaseKey = document.getElementById('supabaseKey').value.trim();
+            config.fbToken = document.getElementById('fbToken').value.trim();
 
-        // Login
-        loginBtn.addEventListener('click', async () => {
-            loginBtn.disabled = true;
-            loginBtn.textContent = 'جاري الاتصال...';
-            spinner.classList.add('active');
-            addLog('جاري فتح فيسبوك...', 'info');
+            localStorage.setItem('supabaseUrl', config.supabaseUrl);
+            localStorage.setItem('supabaseKey', config.supabaseKey);
+            localStorage.setItem('fbToken', config.fbToken);
 
-            const res = await fetch('/api/login', { method: 'POST' });
-            const data = await res.json();
-
-            spinner.classList.remove('active');
-            loginBtn.disabled = false;
-            loginBtn.textContent = '🔗 اتصل بفيسبوك';
-
-            if (data.success) {
-                setStatus(true);
-                addLog('تم الاتصال بنجاح', 'success');
+            if (config.supabaseUrl && config.supabaseKey && config.fbToken) {
+                initSupabase();
+                addLog('تم حفظ الإعدادات', 'success');
             } else {
-                addLog(data.message, 'error');
+                addLog('يرجى ملء كل الحقول', 'error');
             }
         });
 
-        // Logout
-        logoutBtn.addEventListener('click', async () => {
-            await fetch('/api/logout', { method: 'POST' });
-            setStatus(false);
-            addLog('تم قطع الاتصال', 'info');
-        });
-
-        // Post
         postBtn.addEventListener('click', async () => {
             const title = document.getElementById('title').value.trim();
             const description = document.getElementById('description').value.trim();
             const governorate = document.getElementById('governorate').value;
+            const pageId = document.getElementById('pageId').value.trim();
 
-            if (!title || !description || !governorate) {
+            if (!title || !description || !governorate || !pageId) {
                 addLog('يرجى ملء كل الحقول', 'error');
                 return;
             }
 
             postBtn.disabled = true;
             postBtn.textContent = 'جاري النشر...';
-            spinner.classList.add('active');
-            addLog(`جاري النشر في مجموعات ${governorate}...`, 'info');
 
-            const res = await fetch('/api/post', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ title, description, governorate })
-            });
-            const data = await res.json();
+            try {
+                // Save ad to database
+                const { error: dbError } = await supabase
+                    .from('ads')
+                    .insert({
+                        title,
+                        description,
+                        governorate,
+                        page_id: pageId,
+                        status: 'posting'
+                    });
 
-            spinner.classList.remove('active');
-            postBtn.disabled = false;
-            postBtn.textContent = '🚀 ابدأ النشر';
+                if (dbError) throw dbError;
 
-            if (data.success) {
-                addLog(data.message, 'success');
-            } else {
-                addLog(data.message, 'error');
+                // Search for groups and post
+                addLog(`جاري البحث عن مجموعات ${governorate}...`, 'info');
+
+                const response = await fetch('/api/post', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        title,
+                        description,
+                        governorate,
+                        pageId,
+                        accessToken: config.fbToken
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    addLog(`تم النشر بنجاح في ${result.posted} مجموعة`, 'success');
+                } else {
+                    addLog(result.message || 'فشل النشر', 'error');
+                }
+            } catch (error) {
+                addLog('خطأ: ' + error.message, 'error');
+            } finally {
+                postBtn.disabled = false;
+                postBtn.textContent = '🚀 ابدأ النشر';
             }
         });
     </script>
