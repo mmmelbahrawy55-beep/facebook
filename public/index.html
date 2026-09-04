@@ -77,26 +77,6 @@
         .log-entry.error { background: #ffebee; color: #c62828; }
         .log-entry.info { background: #e3f2fd; color: #1565c0; }
         .divider { margin: 20px 0; border: 1px solid #eee; }
-        .setup-info {
-            background: #fff3cd;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            font-size: 14px;
-        }
-        .setup-info h3 { color: #856404; margin-bottom: 10px; }
-        .setup-info ol { padding-right: 20px; color: #856404; }
-        .ads-list { margin-top: 20px; }
-        .ad-item {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 10px;
-        }
-        .ad-item h4 { color: #333; margin-bottom: 5px; }
-        .ad-item p { color: #666; font-size: 14px; }
-        .ad-actions { margin-top: 10px; display: flex; gap: 10px; }
-        .btn-sm { padding: 8px 16px; font-size: 14px; width: auto; }
     </style>
 </head>
 <body>
@@ -104,48 +84,21 @@
         <h1>📱 نشر على فيسبوك</h1>
         <p class="subtitle">نشر إعلانات على مجموعات فيسبوك</p>
 
-        <div class="setup-info">
-            <h3>⚙️ الإعداد المطلول:</h3>
-            <ol>
-                <li>أنشئ حساب على <a href="https://supabase.com" target="_blank">Supabase</a> (مجاني)</li>
-                <li>أنشئ مشروع جديد وخذ الـ URL و Key</li>
-                <li>أنشئ حساب على <a href="https://developers.facebook.com" target="_blank">Facebook Developers</a></li>
-                <li>أنشئ App واختر "Consumer"</li>
-                <li>احصل على Page Access Token</li>
-            </ol>
-        </div>
+        <div id="statusBox" class="status disconnected">غير متصل بفيسبوك</div>
 
-        <div id="statusBox" class="status disconnected">غير مُعد</div>
-
-        <div class="form-group">
-            <label>🔗 Supabase URL</label>
-            <input type="text" id="supabaseUrl" placeholder="https://xxxxx.supabase.co">
-        </div>
-
-        <div class="form-group">
-            <label>🔑 Supabase Key</label>
-            <input type="text" id="supabaseKey" placeholder="eyJhbGciOiJIUzI1NiIs...">
-        </div>
-
-        <div class="form-group">
-            <label>🎫 Facebook Page Access Token</label>
-            <input type="text" id="fbToken" placeholder="EAAG...">
-        </div>
-
-        <button id="saveConfigBtn" class="btn btn-blue">💾 حفظ الإعدادات</button>
+        <button id="loginBtn" class="btn btn-blue">🔗 اتصل بفيسبوك</button>
+        <button id="logoutBtn" class="btn btn-red" style="display: none;">🔌 قطع الاتصال</button>
 
         <div class="divider"></div>
 
-        <div id="postSection" style="display: none;">
-            <h2 style="margin-bottom: 20px; color: #333;">📝 إعلان جديد</h2>
-            
+        <div id="postForm" style="display: none;">
             <div class="form-group">
-                <label>عنوان الإعلان</label>
+                <label>📝 عنوان الإعلان</label>
                 <input type="text" id="title" placeholder="مثال: مطلوب موظفين">
             </div>
 
             <div class="form-group">
-                <label>وصف الإعلان</label>
+                <label>📄 وصف الإعلان</label>
                 <textarea id="description" placeholder="اكتب تفاصيل الإعلان..."></textarea>
             </div>
 
@@ -153,35 +106,30 @@
                 <label>📍 المحافظة</label>
                 <select id="governorate">
                     <option value="">اختر المحافظة</option>
-                    <option value="Cairo">القاهرة</option>
-                    <option value="Alexandria">الإسكندرية</option>
-                    <option value="Giza">الجيزة</option>
-                    <option value="Qalyubia">القليوبية</option>
-                    <option value="Sharqia">الشرقية</option>
-                    <option value="Dakahlia">الدقهلية</option>
-                    <option value="Beheira">البحيرة</option>
-                    <option value="Kafr El Sheikh">كفر الشيخ</option>
-                    <option value="Gharbia">الغربية</option>
-                    <option value="Monufia">المنوفية</option>
-                    <option value="Damietta">دمياط</option>
-                    <option value="Port Said">بورسعيد</option>
-                    <option value="Ismailia">الإسماعيلية</option>
-                    <option value="Beni Suef">بني سويف</option>
-                    <option value="Faiyum">الفيوم</option>
-                    <option value="Minya">المنيا</option>
-                    <option value="Assiut">أسيوط</option>
-                    <option value="Sohag">سوهاج</option>
-                    <option value="Qena">قنا</option>
-                    <option value="Luxor">الأقصر</option>
-                    <option value="Aswan">أسوان</option>
-                    <option value="Red Sea">البحر الأحمر</option>
-                    <option value="Matrouh">مطروح</option>
+                    <option value="القاهرة">القاهرة</option>
+                    <option value="الإسكندرية">الإسكندرية</option>
+                    <option value="الجيزة">الجيزة</option>
+                    <option value="القليوبية">القليوبية</option>
+                    <option value="الشرقية">الشرقية</option>
+                    <option value="الدقهلية">الدقهلية</option>
+                    <option value="البحيرة">البحيرة</option>
+                    <option value="كفر الشيخ">كفر الشيخ</option>
+                    <option value="الغربية">الغربية</option>
+                    <option value="المنوفية">المنوفية</option>
+                    <option value="دمياط">دمياط</option>
+                    <option value="بورسعيد">بورسعيد</option>
+                    <option value="الإسماعيلية">الإسماعيلية</option>
+                    <option value="بني سويف">بني سويف</option>
+                    <option value="الفيوم">الفيوم</option>
+                    <option value="المنيا">المنيا</option>
+                    <option value="أسيوط">أسيوط</option>
+                    <option value="سوهاج">سوهاج</option>
+                    <option value="قنا">قنا</option>
+                    <option value="الأقصر">الأقصر</option>
+                    <option value="أسوان">أسوان</option>
+                    <option value="البحر الأحمر">البحر الأحمر</option>
+                    <option value="مطروح">مطروح</option>
                 </select>
-            </div>
-
-            <div class="form-group">
-                <label>🔗 رابط الصفحة (Page ID)</label>
-                <input type="text" id="pageId" placeholder="مثال: 123456789">
             </div>
 
             <button id="postBtn" class="btn btn-green">🚀 ابدأ النشر</button>
@@ -190,30 +138,13 @@
         <div id="log" class="log"></div>
     </div>
 
-    <script type="module">
-        import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-
-        let supabase = null;
-        let config = {
-            supabaseUrl: localStorage.getItem('supabaseUrl') || '',
-            supabaseKey: localStorage.getItem('supabaseKey') || '',
-            fbToken: localStorage.getItem('fbToken') || ''
-        };
-
-        const statusBox = document.getElementById('statusBox');
-        const postSection = document.getElementById('postSection');
-        const logDiv = document.getElementById('log');
-        const saveConfigBtn = document.getElementById('saveConfigBtn');
+    <script>
+        const loginBtn = document.getElementById('loginBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
         const postBtn = document.getElementById('postBtn');
-
-        // Load saved config
-        document.getElementById('supabaseUrl').value = config.supabaseUrl;
-        document.getElementById('supabaseKey').value = config.supabaseKey;
-        document.getElementById('fbToken').value = config.fbToken;
-
-        if (config.supabaseUrl && config.supabaseKey && config.fbToken) {
-            initSupabase();
-        }
+        const postForm = document.getElementById('postForm');
+        const statusBox = document.getElementById('statusBox');
+        const logDiv = document.getElementById('log');
 
         function addLog(msg, type = 'info') {
             logDiv.classList.add('active');
@@ -224,96 +155,77 @@
             logDiv.scrollTop = logDiv.scrollHeight;
         }
 
-        async function initSupabase() {
-            try {
-                supabase = createClient(config.supabaseUrl, config.supabaseKey);
-                
-                // Create tables if not exists
-                await supabase.rpc('create_tables_if_not_exists').catch(() => {
-                    // Table might already exist
-                });
-
-                statusBox.textContent = '✅ جاهز للنشر';
+        function setStatus(connected) {
+            if (connected) {
+                statusBox.textContent = '✅ متصل بفيسبوك';
                 statusBox.className = 'status connected';
-                postSection.style.display = 'block';
-                addLog('تم الاتصال بقاعدة البيانات', 'success');
-            } catch (error) {
-                addLog('خطأ في الاتصال بقاعدة البيانات: ' + error.message, 'error');
+                loginBtn.style.display = 'none';
+                logoutBtn.style.display = 'block';
+                postForm.style.display = 'block';
+            } else {
+                statusBox.textContent = '❌ غير متصل بفيسبوك';
+                statusBox.className = 'status disconnected';
+                loginBtn.style.display = 'block';
+                logoutBtn.style.display = 'none';
+                postForm.style.display = 'none';
             }
         }
 
-        saveConfigBtn.addEventListener('click', () => {
-            config.supabaseUrl = document.getElementById('supabaseUrl').value.trim();
-            config.supabaseKey = document.getElementById('supabaseKey').value.trim();
-            config.fbToken = document.getElementById('fbToken').value.trim();
+        fetch('/api/status').then(r => r.json()).then(d => setStatus(d.loggedIn));
 
-            localStorage.setItem('supabaseUrl', config.supabaseUrl);
-            localStorage.setItem('supabaseKey', config.supabaseKey);
-            localStorage.setItem('fbToken', config.fbToken);
+        loginBtn.addEventListener('click', async () => {
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'جاري الاتصال...';
+            addLog('جاري فتح فيسبوك...', 'info');
 
-            if (config.supabaseUrl && config.supabaseKey && config.fbToken) {
-                initSupabase();
-                addLog('تم حفظ الإعدادات', 'success');
+            const res = await fetch('/api/login', { method: 'POST' });
+            const data = await res.json();
+
+            loginBtn.disabled = false;
+            loginBtn.textContent = '🔗 اتصل بفيسبوك';
+
+            if (data.success) {
+                setStatus(true);
+                addLog('تم الاتصال بنجاح', 'success');
             } else {
-                addLog('يرجى ملء كل الحقول', 'error');
+                addLog(data.message, 'error');
             }
+        });
+
+        logoutBtn.addEventListener('click', async () => {
+            await fetch('/api/logout', { method: 'POST' });
+            setStatus(false);
+            addLog('تم قطع الاتصال', 'info');
         });
 
         postBtn.addEventListener('click', async () => {
             const title = document.getElementById('title').value.trim();
             const description = document.getElementById('description').value.trim();
             const governorate = document.getElementById('governorate').value;
-            const pageId = document.getElementById('pageId').value.trim();
 
-            if (!title || !description || !governorate || !pageId) {
+            if (!title || !description || !governorate) {
                 addLog('يرجى ملء كل الحقول', 'error');
                 return;
             }
 
             postBtn.disabled = true;
             postBtn.textContent = 'جاري النشر...';
+            addLog(`جاري النشر في مجموعات ${governorate}...`, 'info');
 
-            try {
-                // Save ad to database
-                const { error: dbError } = await supabase
-                    .from('ads')
-                    .insert({
-                        title,
-                        description,
-                        governorate,
-                        page_id: pageId,
-                        status: 'posting'
-                    });
+            const res = await fetch('/api/post', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title, description, governorate })
+            });
+            const data = await res.json();
 
-                if (dbError) throw dbError;
+            postBtn.disabled = false;
+            postBtn.textContent = '🚀 ابدأ النشر';
 
-                // Search for groups and post
-                addLog(`جاري البحث عن مجموعات ${governorate}...`, 'info');
-
-                const response = await fetch('/api/post', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        title,
-                        description,
-                        governorate,
-                        pageId,
-                        accessToken: config.fbToken
-                    })
-                });
-
-                const result = await response.json();
-
-                if (result.success) {
-                    addLog(`تم النشر بنجاح في ${result.posted} مجموعة`, 'success');
-                } else {
-                    addLog(result.message || 'فشل النشر', 'error');
-                }
-            } catch (error) {
-                addLog('خطأ: ' + error.message, 'error');
-            } finally {
-                postBtn.disabled = false;
-                postBtn.textContent = '🚀 ابدأ النشر';
+            if (data.success) {
+                addLog(data.message, 'success');
+            } else {
+                addLog(data.message, 'error');
             }
         });
     </script>
