@@ -1,10 +1,2 @@
 node_modules/
-dist/
-data/*.db
-data/facebook-cookies.json
-uploads/*
-!uploads/.gitkeep
-.env
-*.log
-.DS_Store
-Thumbs.db
+package-lock.json
