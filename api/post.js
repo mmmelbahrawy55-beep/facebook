@@ -17,31 +17,36 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    // Search for groups using Facebook Graph API
+    // Get user info
+    const userRes = await fetch(`https://graph.facebook.com/v19.0/me?access_token=${accessToken}`);
+    const user = await userRes.json();
+
+    if (user.error) {
+      return res.status(400).json({ error: 'Invalid access token' });
+    }
+
+    // Search for groups
     const searchUrl = `https://graph.facebook.com/v19.0/search?q=${encodeURIComponent(governorate + ' jobs')}&type=group&access_token=${accessToken}`;
-    
-    const searchResponse = await fetch(searchUrl);
-    const searchData = await searchResponse.json();
+    const searchRes = await fetch(searchUrl);
+    const searchData = await searchRes.json();
 
     if (searchData.error) {
-      return res.status(400).json({ 
-        error: 'Facebook API error: ' + searchData.error.message 
-      });
+      return res.status(400).json({ error: searchData.error.message });
     }
 
     const groups = searchData.data || [];
 
     if (groups.length === 0) {
-      return res.status(404).json({ error: 'No groups found' });
+      return res.status(404).json({ error: 'لم يتم العثور على مجموعات' });
     }
 
-    // Post to each group
+    // Post to groups
     let posted = 0;
     let failed = 0;
 
-    for (const group of groups.slice(0, 5)) { // Limit to 5 groups
+    for (const group of groups.slice(0, 5)) {
       try {
-        const postResponse = await fetch(`https://graph.facebook.com/v19.0/${group.id}/feed`, {
+        const postRes = await fetch(`https://graph.facebook.com/v19.0/${group.id}/feed`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -49,8 +54,7 @@ export default async function handler(req, res) {
             access_token: accessToken
           })
         });
-
-        const result = await postResponse.json();
+        const result = await postRes.json();
         if (result.id) posted++;
         else failed++;
       } catch (e) {
@@ -60,6 +64,7 @@ export default async function handler(req, res) {
 
     // Save to Redis
     await redis.lpush('posts', JSON.stringify({
+      user: user.name,
       title,
       governorate,
       posted,

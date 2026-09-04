@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>نشر على فيسبوك</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://connect.facebook.net/en_US/sdk.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -26,6 +27,15 @@
         }
         h1 { text-align: center; color: #1877f2; margin-bottom: 10px; font-size: 28px; }
         .subtitle { text-align: center; color: #666; margin-bottom: 30px; }
+        .status {
+            text-align: center;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        .status.disconnected { background: #fee; color: #c00; }
+        .status.connected { background: #efe; color: #060; }
         .form-group { margin-bottom: 20px; }
         label { display: block; margin-bottom: 8px; color: #333; font-weight: 600; }
         input, textarea, select {
@@ -50,8 +60,10 @@
             margin-bottom: 10px;
         }
         .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-fb { background: #1877f2; color: white; font-size: 20px; }
         .btn-green { background: #00a400; color: white; }
-        .btn-blue { background: #1877f2; color: white; }
+        .btn-red { background: #e41e3f; color: white; }
+        .divider { margin: 20px 0; border: 1px solid #eee; }
         .result {
             margin-top: 20px;
             padding: 15px;
@@ -60,15 +72,22 @@
         }
         .result.success { display: block; background: #e8f5e9; color: #2e7d32; }
         .result.error { display: block; background: #ffebee; color: #c62828; }
-        .history { margin-top: 30px; }
-        .history h3 { color: #333; margin-bottom: 15px; }
-        .history-item {
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
             background: #f5f5f5;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            font-size: 14px;
+            border-radius: 10px;
+            margin-bottom: 20px;
         }
+        .user-info img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+        }
+        .user-info h4 { color: #333; }
+        .user-info p { color: #666; font-size: 14px; }
     </style>
 </head>
 <body>
@@ -76,128 +95,182 @@
         <h1>📱 نشر على فيسبوك</h1>
         <p class="subtitle">نشر إعلانات على مجموعات فيسبوك</p>
 
-        <div class="form-group">
-            <label>🎫 Facebook Access Token</label>
-            <input type="text" id="token" placeholder="EAAG...">
+        <div id="statusBox" class="status disconnected">غير متصل بفيسبوك</div>
+
+        <div id="loginSection">
+            <button id="loginBtn" class="btn btn-fb" onclick="loginWithFacebook()">
+                🔗 تسجيل الدخول بفيسبوك
+            </button>
         </div>
 
-        <div class="form-group">
-            <label>📝 عنوان الإعلان</label>
-            <input type="text" id="title" placeholder="مثال: مطلوب موظفين">
+        <div id="userSection" style="display: none;">
+            <div class="user-info" id="userInfo"></div>
+            <button id="logoutBtn" class="btn btn-red" onclick="logoutFromFacebook()">
+                🔌 قطع الاتصال
+            </button>
         </div>
 
-        <div class="form-group">
-            <label>📄 وصف الإعلان</label>
-            <textarea id="description" placeholder="اكتب تفاصيل الإعلان..."></textarea>
-        </div>
+        <div class="divider"></div>
 
-        <div class="form-group">
-            <label>📍 المحافظة</label>
-            <select id="governorate">
-                <option value="">اختر المحافظة</option>
-                <option value="Cairo">القاهرة</option>
-                <option value="Alexandria">الإسكندرية</option>
-                <option value="Giza">الجيزة</option>
-                <option value="Qalyubia">القليوبية</option>
-                <option value="Sharqia">الشرقية</option>
-                <option value="Dakahlia">الدقهلية</option>
-                <option value="Beheira">البحيرة</option>
-                <option value="Kafr El Sheikh">كفر الشيخ</option>
-                <option value="Gharbia">الغربية</option>
-                <option value="Monufia">المنوفية</option>
-                <option value="Damietta">دمياط</option>
-                <option value="Port Said">بورسعيد</option>
-                <option value="Ismailia">الإسماعيلية</option>
-                <option value="Beni Suef">بني سويف</option>
-                <option value="Faiyum">الفيوم</option>
-                <option value="Minya">المنيا</option>
-                <option value="Assiut">أسيوط</option>
-                <option value="Sohag">سوهاج</option>
-                <option value="Qena">قنا</option>
-                <option value="Luxor">الأقصر</option>
-                <option value="Aswan">أسوان</option>
-                <option value="Red Sea">البحر الأحمر</option>
-                <option value="Matrouh">مطروح</option>
-            </select>
-        </div>
+        <div id="postSection" style="display: none;">
+            <div class="form-group">
+                <label>📝 عنوان الإعلان</label>
+                <input type="text" id="title" placeholder="مثال: مطلوب موظفين">
+            </div>
 
-        <button id="postBtn" class="btn btn-green">🚀 ابدأ النشر</button>
+            <div class="form-group">
+                <label>📄 وصف الإعلان</label>
+                <textarea id="description" placeholder="اكتب تفاصيل الإعلان..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>📍 المحافظة</label>
+                <select id="governorate">
+                    <option value="">اختر المحافظة</option>
+                    <option value="Cairo">القاهرة</option>
+                    <option value="Alexandria">الإسكندرية</option>
+                    <option value="Giza">الجيزة</option>
+                    <option value="Qalyubia">القليوبية</option>
+                    <option value="Sharqia">الشرقية</option>
+                    <option value="Dakahlia">الدقهلية</option>
+                    <option value="Beheira">البحيرة</option>
+                    <option value="Kafr El Sheikh">كفر الشيخ</option>
+                    <option value="Gharbia">الغربية</option>
+                    <option value="Monufia">المنوفية</option>
+                    <option value="Damietta">دمياط</option>
+                    <option value="Port Said">بورسعيد</option>
+                    <option value="Ismailia">الإسماعيلية</option>
+                    <option value="Beni Suef">بني سويف</option>
+                    <option value="Faiyum">الفيوم</option>
+                    <option value="Minya">المنيا</option>
+                    <option value="Assiut">أسيوط</option>
+                    <option value="Sohag">سوهاج</option>
+                    <option value="Qena">قنا</option>
+                    <option value="Luxor">الأقصر</option>
+                    <option value="Aswan">أسوان</option>
+                    <option value="Red Sea">البحر الأحمر</option>
+                    <option value="Matrouh">مطروح</option>
+                </select>
+            </div>
+
+            <button id="postBtn" class="btn btn-green" onclick="startPosting()">
+                🚀 ابدأ النشر
+            </button>
+        </div>
 
         <div id="result" class="result"></div>
-
-        <div class="history">
-            <h3>📊 آخر النشر</h3>
-            <div id="historyList">جاري التحميل...</div>
-        </div>
     </div>
 
     <script>
-        const postBtn = document.getElementById('postBtn');
-        const resultDiv = document.getElementById('result');
-        const historyList = document.getElementById('historyList');
+        let fbAccessToken = null;
+        let fbUser = null;
 
-        // Load history
-        async function loadHistory() {
-            try {
-                const res = await fetch('/api/history');
-                const data = await res.json();
-                if (data.length === 0) {
-                    historyList.innerHTML = 'لا يوجد سجل بعد';
-                    return;
+        // Initialize Facebook SDK
+        window.fbAsyncInit = function() {
+            FB.init({
+                appId: 'YOUR_FACEBOOK_APP_ID', // حط App ID بتاعك هنا
+                cookie: true,
+                xfbml: true,
+                version: 'v19.0'
+            });
+        };
+
+        function loginWithFacebook() {
+            FB.login(function(response) {
+                if (response.authResponse) {
+                    fbAccessToken = response.authResponse.accessToken;
+                    getUserInfo();
+                } else {
+                    showResult('تم إلغاء تسجيل الدخول', 'error');
                 }
-                historyList.innerHTML = data.map(h => `
-                    <div class="history-item">
-                        <strong>${h.title}</strong> - ${h.governorate}<br>
-                        ✅ ${h.posted} نجح | ❌ ${h.failed} فشل
-                    </div>
-                `).join('');
-            } catch (e) {
-                historyList.innerHTML = 'خطأ في التحميل';
-            }
+            }, { scope: 'pages_manage_posts,pages_read_engagement,groups_manage_posts' });
         }
-        loadHistory();
 
-        // Post
-        postBtn.addEventListener('click', async () => {
-            const token = document.getElementById('token').value.trim();
+        function getUserInfo() {
+            FB.api('/me', { fields: 'name,email,picture' }, function(response) {
+                fbUser = response;
+                showLoggedIn();
+            });
+        }
+
+        function showLoggedIn() {
+            document.getElementById('statusBox').textContent = '✅ متصل بفيسبوك';
+            document.getElementById('statusBox').className = 'status connected';
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('userSection').style.display = 'block';
+            document.getElementById('postSection').style.display = 'block';
+            
+            document.getElementById('userInfo').innerHTML = `
+                <img src="${fbUser.picture.data.url}" alt="${fbUser.name}">
+                <div>
+                    <h4>${fbUser.name}</h4>
+                    <p>${fbUser.email || 'متصل بفيسبوك'}</p>
+                </div>
+            `;
+        }
+
+        function logoutFromFacebook() {
+            FB.logout(function() {
+                fbAccessToken = null;
+                fbUser = null;
+                document.getElementById('statusBox').textContent = '❌ غير متصل بفيسبوك';
+                document.getElementById('statusBox').className = 'status disconnected';
+                document.getElementById('loginSection').style.display = 'block';
+                document.getElementById('userSection').style.display = 'none';
+                document.getElementById('postSection').style.display = 'none';
+            });
+        }
+
+        async function startPosting() {
             const title = document.getElementById('title').value.trim();
             const description = document.getElementById('description').value.trim();
             const governorate = document.getElementById('governorate').value;
 
-            if (!token || !title || !description || !governorate) {
-                resultDiv.className = 'result error';
-                resultDiv.textContent = 'يرجى ملء كل الحقول';
+            if (!title || !description || !governorate) {
+                showResult('يرجى ملء كل الحقول', 'error');
                 return;
             }
 
+            if (!fbAccessToken) {
+                showResult('يجب تسجيل الدخول بفيسبوك أولاً', 'error');
+                return;
+            }
+
+            const postBtn = document.getElementById('postBtn');
             postBtn.disabled = true;
             postBtn.textContent = 'جاري النشر...';
-            resultDiv.className = 'result';
 
             try {
                 const res = await fetch('/api/post', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ title, description, governorate, accessToken: token })
+                    body: JSON.stringify({
+                        title,
+                        description,
+                        governorate,
+                        accessToken: fbAccessToken
+                    })
                 });
                 const data = await res.json();
 
                 if (data.error) {
-                    resultDiv.className = 'result error';
-                    resultDiv.textContent = data.error;
+                    showResult(data.error, 'error');
                 } else {
-                    resultDiv.className = 'result success';
-                    resultDiv.textContent = `✅ تم النشر: ${data.posted} نجح, ${data.failed} فشل`;
-                    loadHistory();
+                    showResult(`✅ تم النشر في ${data.posted} مجموعة`, 'success');
                 }
             } catch (e) {
-                resultDiv.className = 'result error';
-                resultDiv.textContent = 'خطأ في الاتصال';
+                showResult('خطأ في الاتصال', 'error');
             }
 
             postBtn.disabled = false;
             postBtn.textContent = '🚀 ابدأ النشر';
-        });
+        }
+
+        function showResult(msg, type) {
+            const result = document.getElementById('result');
+            result.className = `result ${type}`;
+            result.textContent = msg;
+        }
     </script>
 </body>
 </html>
